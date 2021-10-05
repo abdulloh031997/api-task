@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Resources\ShopResource;
 use App\Http\Resources\ShopCollection;
 use App\Shop;
-
+use Illuminate\Support\Facades\Validator;
 class ShopController extends BaseController
 {
     /**
@@ -17,7 +17,7 @@ class ShopController extends BaseController
      */
     public function index()
     {
-        $data = new ShopCollection(Shop::paginate());
+        $data = new ShopCollection(Shop::with('product')->paginate());
         return $this->sendResponse($data, 'Shop successfully.');
     }
 
@@ -39,15 +39,21 @@ class ShopController extends BaseController
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|unique:posts|max:1',
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|unique:shops|max:6',
         ]);
-        $book = SHop::create([
-            'name' => $request->name,
-            'created_at' => date(now()),
-          ]);
 
-          return new ShopResource($book);
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors());
+        }
+        if ($validator->passes()) {
+            $shop = SHop::create([
+                'name' => $request->name,
+                'created_at' => date(now()),
+            ]);
+            $data = new ShopResource($shop);
+            return $this->sendResponse($data, 'Shop successfully.');
+         }
     }
 
     /**
@@ -59,7 +65,13 @@ class ShopController extends BaseController
     public function show(Shop $shop)
     {
         $data = new ShopResource($shop);
-        return $this->sendResponse($data, $data->name.' '.'shop returned.');
+        if(!empty($data))
+        {
+            return $this->sendResponse($data, $data->name.' '.'shop returned.');
+        }
+        else{
+            return $this->sendError($shop ,'404 not found');
+        }
     }
 
     /**
@@ -68,9 +80,9 @@ class ShopController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request, $shop)
     {
-        //
+
     }
 
     /**
@@ -82,7 +94,19 @@ class ShopController extends BaseController
      */
     public function update(Request $request, $id)
     {
-        //
+        $shop = Shop::findOrFail($id);
+        $input = $request->all();
+        $validator = Validator::make($input, [
+            'name' => 'required|unique:shops|max:6.',
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors());
+        }
+        if ($validator->passes()) {
+            $shop->fill($input)->save();
+            $shop =  new ShopResource($shop);
+            return $this->sendResponse($shop, 'Shop updated success.');
+         }
     }
 
     /**
@@ -91,8 +115,9 @@ class ShopController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Shop $shop)
     {
-        //
+        $shop->delete();
+        return $this->sendResponse($shop->name, 'Shop  deleted success.');
     }
 }
