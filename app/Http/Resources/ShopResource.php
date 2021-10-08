@@ -14,10 +14,11 @@ class ShopResource extends JsonResource
      */
     public function toArray($request)
     {
+        $product = $this->whenLoaded('product');
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'product'=> new ProductCollection($this->product)
+            'product'=>  ProductResource::collection($product)
             // 'created_at' => $this->created_at,
             // 'updated_at' => $this->updated_at,
 

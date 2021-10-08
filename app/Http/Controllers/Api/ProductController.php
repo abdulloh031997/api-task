@@ -16,7 +16,7 @@ class ProductController extends BaseController
      */
     public function index()
     {
-        $data = new ProductCollection(Product::with('shops')->paginate());
+        $data =  ProductResource::collection(Product::with(['shops'])->paginate());
         return $this->sendResponse($data, 'Shop successfully.');
     }
 

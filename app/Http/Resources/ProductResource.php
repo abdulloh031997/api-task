@@ -19,7 +19,7 @@ class ProductResource extends JsonResource
             'name' => $this->name,
             'price' => $this->price,
             'shop_id'=>$this->shop_id,
-            'shop'=>$this->shops,
+            'shop'=> ShopResource::collection($this->whenLoaded('shops')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 

@@ -8,8 +8,14 @@ class Product extends Model
 {
     protected $fillable = ['shop_id','name', 'price','created_at', 'updated_At'];
 
-    public function Shops()
+    // public function Shops()
+    // {
+    //     return $this->belongsTo(Shop::class,'id');
+    // }
+ 
+    public function shops()
     {
-        return $this->hasOne(Shop::class,'id');
+        return $this->hasMany('App\Shop','id','shop_id');
     }
+    
 }
