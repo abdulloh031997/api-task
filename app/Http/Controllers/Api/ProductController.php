@@ -16,7 +16,7 @@ class ProductController extends BaseController
      */
     public function index()
     {
-        $data =  ProductResource::collection(Product::with(['shops'])->paginate());
+        $data =  new  ProductCollection(Product::with(['shops'])->paginate());
         return $this->sendResponse($data, 'Shop successfully.');
     }
 
@@ -47,9 +47,10 @@ class ProductController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Product $product)
     {
-        //
+        $data = new ProductResource($product->loadMissing('shops'));
+        return $this->sendResponse($data, 'one data.');
     }
 
     /**
