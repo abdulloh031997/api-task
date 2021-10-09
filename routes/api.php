@@ -13,15 +13,25 @@ use App\Http\Controllers\Api\AuthController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::group(['middleware'=>['auth:sanctum']], function () {
+// Passport
+
+Route::middleware('auth:api')->group( function () {
     Route::resource('shops', 'Api\ShopController');
     Route::resource('products', 'Api\ProductController');
     Route::post('/logout', [AuthController::class, 'logout']);
 });
+
+
+// sanctum
+
+// Route::group(['middleware'=>['auth:sanctum']], function () {
+//     Route::resource('shops', 'Api\ShopController');
+//     Route::resource('products', 'Api\ProductController');
+//     Route::post('/logout', [AuthController::class, 'logout']);
+// });
+    // Route::post('/login', [AuthController::class, 'login']);
+    
+

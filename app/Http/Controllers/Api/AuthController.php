@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 class AuthController extends BaseController
 {
     public function register(Request $request)
@@ -29,21 +30,40 @@ class AuthController extends BaseController
         ];
         return $this->sendResponse($response, 'Auth registr successfully.');
     }
+    // public function login(Request $request)
+    // {
+    //     $fields = $request->validate([
+    //         'email'=>'required|string',
+    //         'password'=>'required|string'
+    //     ]);
+    //     $user = User::where('email',$fields['email'])->first();
+    //     if(!$user || !Hash::check($fields['password'],$user->password)){
+    //         return response([
+    //             'massage' => 'Badd request'
+    //         ],401);
+    //     }
+    //     $token = $user->createToken('myapptoken')->accessToken;
+    //     $response = [
+    //         'user'=>$user,
+    //         'token'=>$token
+    //     ];
+    //     return $this->sendResponse($response, 'Auth login successfully.');
+    // }
+
     public function login(Request $request)
     {
-        $fields = $request->validate([
+        $login = $request->validate([
             'email'=>'required|string',
             'password'=>'required|string'
         ]);
-        $user = User::where('email',$fields['email'])->first();
-        if(!$user || !Hash::check($fields['password'],$user->password)){
+        if(!Auth::attempt($login)){
             return response([
                 'massage' => 'Badd request'
             ],401);
         }
-        $token = $user->createToken('myapptoken')->plainTextToken;
+        $token = Auth::user()->createToken('tokenjon')->accessToken;
         $response = [
-            'user'=>$user,
+            'user'=>Auth::user(),
             'token'=>$token
         ];
         return $this->sendResponse($response, 'Auth login successfully.');
